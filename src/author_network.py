@@ -1,16 +1,17 @@
 import argparse
+import pickle
 import networkx as nx
 import matplotlib.pyplot as plt
 from pprint import pprint
 
 def generate_example_dict():
     dict = {
-        "author1": [("author2", 1), ("author3", 4), ("author4", 2)],
-        "author2": [("author1", 1), ("author3", 3), ("author4", 5)],
+        "author1": [("author2", 3), ("author3", 4), ("author4", 2)],
+        "author2": [("author1", 3), ("author3", 3), ("author4", 5)],
         "author3": [("author1", 4), ("author2", 3)],
         "author4": [("author1", 2), ("author2", 5)]
         }
-    
+
     return dict
 
 def generate_graph(author_dict):
@@ -31,14 +32,15 @@ def show_graph(graph):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-e", action="store_true", default=False)
+    parser.add_argument("-d", help=".pickle file containing the dictionary.")
     args = parser.parse_args()
 
-    if args.e:
-        author_dict = generate_example_dict()
+    if args.d:
+        with open(args.d, "rb") as file:
+            author_dict = pickle.load(file)
     else:
-        author_dict = 0
-        print("No can do")
+        print("Using example graph\n")
+        author_dict = generate_example_dict()
 
     if author_dict:
         coauthor_graph = generate_graph(author_dict)
