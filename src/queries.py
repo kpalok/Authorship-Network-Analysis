@@ -10,6 +10,17 @@ def loadPickleDict(path):
     with open(path, 'rb') as handle:
         return pickle.load(handle)
 
+def getAverageCoauthorCountPerCoAuthor(author_name, dict_pickle):
+
+    authors = loadPickleDict(dict_pickle)
+    c3_sum = 0
+
+    for coauthor in authors[author_name]:
+        couauthors2 = authors[coauthor[0]]
+        c3_sum += len(couauthors2)
+    
+    return c3_sum / len(authors[author_name])
+
 def getCoauthors(author_name, author_urlpt, depth):
     authors = {}
     coauthors = []
@@ -22,7 +33,7 @@ def getCoauthors(author_name, author_urlpt, depth):
             if i == 9:
                 raise Exception("Failed to open xml document after 10 retries: {}".format(ex))
             else:
-                time.sleep(1)
+                time.sleep(10*(i+1))
 
     coauthors_xml = parse(dblp_url)
 
@@ -35,19 +46,22 @@ def getCoauthors(author_name, author_urlpt, depth):
 
     authors[author_name] = coauthors
 
-    if depth > 1:
+    if depth > 1 and len(coauthors) > 0:
         for coauthor in coauthors:
             authors.update(getCoauthors(coauthor[0], coauthor[1], depth-1))
 
     return authors
 
 if __name__ == "__main__":
-    dict_yu = getCoauthors("Philip S. Yu", "y/Yu:Philip_S=", 2)
+    # dict_yu = getCoauthors("Philip S. Yu", "y/Yu:Philip_S=", 2)
 
-    with open('dictionaries/dict_yu.pickle', 'wb') as yu:
-        pickle.dump(dict_yu, yu, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('dictionaries/dict_yu.pickle', 'wb') as yu:
+    #     pickle.dump(dict_yu, yu, protocol=pickle.HIGHEST_PROTOCOL)
 
-    dict_leung = getCoauthors("Victor C. M. Leung", "l/Leung:Victor_C=_M=", 2)
+    # dict_leung = getCoauthors("Victor C. M. Leung", "l/Leung:Victor_C=_M=", 2)
 
-    with open('dictionaries/dict_leung.pickle', 'wb') as leung:
-        pickle.dump(dict_leung, leung, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('dictionaries/dict_leung.pickle', 'wb') as leung:
+    #     pickle.dump(dict_leung, leung, protocol=pickle.HIGHEST_PROTOCOL)
+
+    print("Philip S. Yu average co-authors of each co-author: ", getAverageCoauthorCountPerCoAuthor("Philip S. Yu", 'dictionaries/dict_yu.pickle'))
+    print("Victor C. M. Leung average co-authors of each co-author: ", getAverageCoauthorCountPerCoAuthor("Victor C. M. Leung", 'dictionaries/dict_leung.pickle'))

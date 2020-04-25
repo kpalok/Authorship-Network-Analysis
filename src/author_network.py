@@ -1,5 +1,6 @@
 import argparse
 import pickle
+import queries
 import networkx as nx
 import matplotlib.pyplot as plt
 from pprint import pprint
@@ -40,8 +41,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.d:
-        with open(args.d, "rb") as file:
-            author_dict = pickle.load(file)
+        queries.loadPickleDict(args.d)
     else:
         print("Using example graph\n")
         author_dict = generate_example_dict()
