@@ -2,3 +2,4 @@
 .DS_Store
 #just vscode things
 .vscode/
+rsc/_pycache__/
