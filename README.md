@@ -1,2 +1,2 @@
-# ClimateTwitter
-Introduction to social network analysis: Project 4. Analysis of Climate Change Community
+# Authorship Network Analysis
+Introduction to social network analysis: Project 19: Authorship Network Analysis
