@@ -34,10 +34,17 @@ def show_graph(graph):
     nx.draw_networkx(graph, node_size=5, alpha=0.75, with_labels=False)
     plt.show()
 
+def save_graph(graph):
+    plt.figure(num=None, figsize=(20, 20), dpi=80)
+    plt.axis('off')
+    nx.draw_networkx(graph, node_size=5, alpha=0.75, with_labels=False)
+    plt.savefig("graph.pdf", bbox_inches="tight")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", help=".pickle file containing the dictionary.")
     parser.add_argument("-p", action="store_false", default=True, help="If set, plots the graph.")
+    parser.add_argument("-s", action="store_true", default=False, help="If set, saves the graph.")
     args = parser.parse_args()
 
     if args.d:
@@ -50,4 +57,6 @@ if __name__ == "__main__":
         coauthor_graph = generate_graph(author_dict)
         if args.p:
             show_graph(coauthor_graph)
+        if args.s:
+            save_graph(coauthor_graph)
     
