@@ -21,7 +21,7 @@ def generate_graph(author_dict):
 
     for author, coauthors in author_dict.items():
         for coauthor in coauthors:
-            if coauthor[2] >= 2:
+            if coauthor[2] >= 2 and not coauthor_graph.has_edge((author, coauthor[0])):
                 coauthor_graph.add_edge(author, coauthor[0])
             else:
                 if not coauthor_graph.has_node(coauthor[0]):
@@ -36,7 +36,7 @@ def show_graph(graph):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", help=".pickle file containing the dictionary.")
-    parser.add_argument("-p", action="store_true", default=False, help="If set, plots the graph.")
+    parser.add_argument("-p", action="store_false", default=True, help="If set, plots the graph.")
     args = parser.parse_args()
 
     if args.d:
