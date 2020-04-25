@@ -1,5 +1,6 @@
 import argparse
 import pickle
+import queries
 import networkx as nx
 import matplotlib.pyplot as plt
 from pprint import pprint
@@ -36,12 +37,11 @@ def show_graph(graph):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", help=".pickle file containing the dictionary.")
-    parser.add_argument("-p", action="store_true", default=False, help="If set, plots the graph.")
+    parser.add_argument("-p", action="store_true", default=True, help="If set, plots the graph.")
     args = parser.parse_args()
 
     if args.d:
-        with open(args.d, "rb") as file:
-            author_dict = pickle.load(file)
+        queries.loadPickleDict(args.d)
     else:
         print("Using example graph\n")
         author_dict = generate_example_dict()
