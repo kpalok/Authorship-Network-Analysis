@@ -1,2 +1,5 @@
 # Just Mac things
 .DS_Store
+
+# vscode
+.vscode
