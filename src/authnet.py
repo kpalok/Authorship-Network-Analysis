@@ -31,7 +31,7 @@ def generate_graph(author_dict):
     return coauthor_graph
 
 def show_graph(graph):
-    nx.draw_networkx(graph, node_size=5, alpha=0.75, with_labels=False)
+    nx.draw_networkx(graph, node_size=30, alpha=0.75, with_labels=False)
     plt.show()
 
 def save_graph(graph):
