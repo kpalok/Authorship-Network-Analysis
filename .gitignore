@@ -1,5 +1,4 @@
 # Just Mac things
 .DS_Store
-
-# vscode
-.vscode
+#just vscode things
+.vscode/
