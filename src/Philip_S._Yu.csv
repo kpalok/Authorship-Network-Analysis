@@ -1,0 +1,10 @@
+Variable,Value
+Avg clustering coefficient,0.039994003539552375
+Avg degree centrality,1.3594403791132835e-05
+Var degree centrality,1.4488519671578386e-08
+Avg closeness centrality,0.03594046745331125
+Var closeness centrality,0.002016005519380346
+Avg betweeness centrality,5.846218259208528e-06
+Var betweeness centrality,5.16341395765653e-08
+Graph diameter,11
+Giant component size,34908
