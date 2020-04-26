@@ -1,6 +1,8 @@
+import os.path
 import argparse
 import pickle
 import queries
+import csv
 import networkx as nx
 import matplotlib.pyplot as plt
 from networkx.algorithms import community
@@ -48,13 +50,27 @@ def search_communities(graph, graph_name):
     with open('communities/{}'.format(graph_name[13:]), 'wb') as file:
         pickle.dump(list(community_gen), file, protocol=pickle.HIGHEST_PROTOCOL)
 
+def get_degree_centrality_csv(graph):
+    dc_dict = nx.degree_centrality(graph)
+
+    index = 0
+    while os.path.isfile("dc_{}.csv".format(index)):
+        index += 1
+    
+    with open("dc_{}.csv".format(index), "w") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=["node", "degree centrality"])
+        writer.writeheader()
+        for key, value in dc_dict.items():
+            writer.writerow({"node": key, "degree centrality": value})
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", help=".pickle file containing the dictionary.")
-    parser.add_argument("-p", action="store_true", default=False, help="If set, plots the graph.")
-    parser.add_argument("-a", action="store_true", default=False, help="If set, includes isolated nodes to graph.")
-    parser.add_argument("-s", action="store_true", default=False, help="If set, saves the graph.")
-    parser.add_argument("-c", action="store_true", default=False, help="If set, analyses communities with k-clique k=2.")
+    parser.add_argument("-p", action="store_true", default=False, help="Plot the graph.")
+    parser.add_argument("-a", action="store_true", default=False, help="Include isolated nodes to graph.")
+    parser.add_argument("-s", action="store_true", default=False, help="Save the graph.")
+    parser.add_argument("-c", action="store_true", default=False, help="Analyse communities with k-clique k=2.")
+    parser.add_argument("--degree", action="store_true", default=False, help="Get csv file of the degree centrality values.")
     args = parser.parse_args()
 
     if args.d:
@@ -71,4 +87,6 @@ if __name__ == "__main__":
             show_graph(coauthor_graph)
         if args.s:
             save_graph(coauthor_graph, args.d)
+        if args.degree:
+            get_degree_centrality_csv(coauthor_graph)
     
