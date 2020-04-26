@@ -5,8 +5,16 @@ import pandas as pd
 import authnet
 import argparse
 import queries
+import csv
 
-def summarize_graph(graph):
+def save_summary(name, data):
+    with open(name, "w") as f:
+        writer = csv.writer(f)
+        writer.writerow([("Variable"), ("Value")])
+        for i in data:
+            writer.writerow(i)
+
+def summarize_graph(graph, dictionary):
     calculations = []
 
     # average clustering coefficient
@@ -47,15 +55,15 @@ def summarize_graph(graph):
     # giant component of the graph
     giant_component_size = len(max(nx.connected_components(graph), key = len))
     calculations.append(["Giant component size", giant_component_size])
+    
+    name = str(list(dictionary)[0]).replace(" ", "_")
+    name = ".".join((name, "csv"))
 
-    # data visualised in table
-    print("******* Data table *******\n")
-    df = pd.DataFrame(calculations, columns=["Variable", "Value"])
-    print(df.round(3))
+    save_summary(name, calculations)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", help=".pickle file containing the dictionary.")
+    parser.add_argument("-d", required=True, help=".pickle file containing the dictionary.")
     args = parser.parse_args()
 
     if args.d:
@@ -63,4 +71,4 @@ if __name__ == "__main__":
 
     if author_dict:
         coauthor_graph = authnet.generate_graph(author_dict)
-        summarize_graph(coauthor_graph)
+        summarize_graph(coauthor_graph, author_dict)
