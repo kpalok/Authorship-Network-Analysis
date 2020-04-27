@@ -4,3 +4,7 @@
 .vscode/
 rsc/_pycache__/
 __pycache__/
+
+# Just R things
+.RData
+.Rhistory
