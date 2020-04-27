@@ -58,15 +58,11 @@ def show_graph(graph):
     nx.draw_networkx(graph, node_size=30, alpha=0.75, with_labels=False)
     plt.show()
 
-def save_graph(graph):
-    index = 0
-    while os.path.isfile("graph_{}.pdf".format(index)):
-        index += 1
-
+def save_graph(graph, dict_name):
     plt.figure(num=None, figsize=(20, 20), dpi=100)
     plt.axis('off')
     nx.draw_networkx(graph, node_size=5, alpha=0.75, with_labels=False)
-    plt.savefig("graph_{}.pdf".format(index), bbox_inches="tight")
+    plt.savefig("graph_{}.pdf".format(dict_name), bbox_inches="tight")
 
 def search_communities(graph, graph_name):
     community_gen = community.k_clique_communities(graph, 2)
@@ -128,7 +124,7 @@ if __name__ == "__main__":
         if args.p:
             show_graph(coauthor_graph)
         if args.s:
-            save_graph(coauthor_graph)
+            save_graph(coauthor_graph, args.d.split('/')[1].split('.')[0])
         if args.degree:
             get_degree_centrality_csv(coauthor_graph)
     
