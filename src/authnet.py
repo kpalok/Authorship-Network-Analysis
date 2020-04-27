@@ -82,7 +82,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", action="store_true", default=False, help="Save the graph.")
     parser.add_argument("-c", action="store_true", default=False, help="Analyse communities with k-clique k=2.")
     parser.add_argument("--degree", action="store_true", default=False, help="Get csv file of the degree centrality values.")
-    parser.add_argument("--prune", nargs=2, type=float, default=[0.0001, 0.001], metavar=("LOWER", "UPPER"),
+    parser.add_argument("--prune", nargs=2, type=float, default=None, metavar=("LOWER", "UPPER"),
                         help="Prune the graph with degree centrality. E.g. --prune 0.0001 0.001")
     args = parser.parse_args()
 
