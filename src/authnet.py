@@ -31,12 +31,11 @@ def generate_affiliation_graph(author_dict, affiliation_dict, all_nodes):
 
     for author, coauthors in author_dict.items():
         author_aff = affiliation_dict[author]
-        
-        for coauthor in coauthors:
-            coauthor_aff = affiliation_dict[coauthor[0]]
-
-            if not coauthor_graph.has_edge(author_aff, coauthor_aff):
-                coauthor_graph.add_edge(author_aff, coauthor_aff)
+        if author_aff != None:
+            for coauthor in coauthors:
+                coauthor_aff = affiliation_dict[coauthor[0]]
+                if coauthor_aff != None and not coauthor_graph.has_edge(author_aff, coauthor_aff):
+                    coauthor_graph.add_edge(author_aff, coauthor_aff)
 
     return coauthor_graph
 

@@ -71,7 +71,7 @@ if __name__ == "__main__":
         author_dict = queries.loadPickleDict(args.d)
 
     if author_dict and args.aff:
-        affiliation_graph = authnet.generate_affiliation_graph(author_dict, queries.loadPickleDict(args.aff))
+        affiliation_graph = authnet.generate_affiliation_graph(author_dict, queries.loadPickleDict(args.aff), True)
         summarize_graph(affiliation_graph, author_dict)
     elif author_dict:
         coauthor_graph = authnet.generate_graph(author_dict)
