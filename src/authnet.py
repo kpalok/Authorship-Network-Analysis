@@ -18,6 +18,28 @@ def generate_example_dict():
 
     return dict
 
+def generate_affiliation_graph(author_dict, affiliation_dict, all_nodes):
+    coauthor_graph = nx.Graph()
+    # gen only unique values without None value
+    s = set()
+    for aff in affiliation_dict.values():
+        if aff != None:
+            s.add(aff)
+
+    if all_nodes:
+        coauthor_graph.add_nodes_from(s)
+
+    for author, coauthors in author_dict.items():
+        author_aff = affiliation_dict[author]
+        
+        for coauthor in coauthors:
+            coauthor_aff = affiliation_dict[coauthor[0]]
+
+            if not coauthor_graph.has_edge(author_aff, coauthor_aff):
+                coauthor_graph.add_edge(author_aff, coauthor_aff)
+
+    return coauthor_graph
+
 def generate_graph(author_dict, all_nodes):
     coauthor_graph = nx.Graph()
 
@@ -82,10 +104,11 @@ if __name__ == "__main__":
     parser.add_argument("-s", action="store_true", default=False, help="Save the graph.")
     parser.add_argument("-c", action="store_true", default=False, help="Analyse communities with k-clique k=2.")
     parser.add_argument("--degree", action="store_true", default=False, help="Get csv file of the degree centrality values.")
-    parser.add_argument("--prune", nargs=2, type=float, default=[0.0001, 0.001], metavar=("LOWER", "UPPER"),
+    parser.add_argument("--prune", nargs=2, type=float, metavar=("LOWER", "UPPER"),
                         help="Prune the graph with degree centrality. E.g. --prune 0.0001 0.001")
+    parser.add_argument("--aff", help=".pickle file containing affiliation dictionary")
     args = parser.parse_args()
-
+ 
     if args.d:
         author_dict = queries.loadPickleDict(args.d)
     else:
@@ -93,7 +116,12 @@ if __name__ == "__main__":
         author_dict = generate_example_dict()
 
     if author_dict:
-        coauthor_graph = generate_graph(author_dict, args.a)
+        if args.aff:
+            affiliation_dict = queries.loadPickleDict(args.aff)
+            coauthor_graph = generate_affiliation_graph(author_dict, affiliation_dict, args.a)
+        else:
+            coauthor_graph = generate_graph(author_dict, args.a)
+
         if args.prune:
             coauthor_graph = prune_graph(coauthor_graph, args.prune[0], args.prune[1])
         if args.c:
