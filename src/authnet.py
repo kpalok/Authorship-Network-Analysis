@@ -55,14 +55,18 @@ def generate_graph(author_dict, all_nodes=False):
     return coauthor_graph
 
 def show_graph(graph):
-    nx.draw_networkx(graph, node_size=30, alpha=0.75, with_labels=False)
+    nx.draw_networkx(graph, node_size=30, alpha=0.75, with_labels=False, width=0.1)
     plt.show()
 
 def save_graph(graph, dict_name):
+    index = 0
+    while os.path.isfile("../images/graph_{}{}.pdf".format(dict_name, index)):
+        index += 1
+
     plt.figure(num=None, figsize=(20, 20), dpi=100)
     plt.axis('off')
-    nx.draw_networkx(graph, node_size=5, alpha=0.75, with_labels=False)
-    plt.savefig("graph_{}.pdf".format(dict_name), bbox_inches="tight")
+    nx.draw_networkx(graph, node_size=5, alpha=0.75, with_labels=False, width=0.1)
+    plt.savefig("../images/graph_{}{}.pdf".format(dict_name, index), bbox_inches="tight")
 
 def search_communities(graph, graph_name):
     community_gen = community.k_clique_communities(graph, 2)
@@ -75,10 +79,10 @@ def get_degree_centrality_csv(graph):
     dc_dict = nx.degree_centrality(graph)
 
     index = 0
-    while os.path.isfile("dc_{}.csv".format(index)):
+    while os.path.isfile("../data/dc_{}.csv".format(index)):
         index += 1
     
-    with open("dc_{}.csv".format(index), "w") as csvfile:
+    with open("../data/dc_{}.csv".format(index), "w") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=["node", "degree centrality"])
         writer.writeheader()
         for key, value in dc_dict.items():
