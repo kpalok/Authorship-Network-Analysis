@@ -57,18 +57,22 @@ def summarize_graph(graph, dictionary):
     calculations.append(["Giant component size", giant_component_size])
     
     name = str(list(dictionary)[0]).replace(" ", "_")
-    name = ".".join((name, "csv"))
+    name = "_aff.".join((name, "csv"))
 
     save_summary(name, calculations)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", required=True, help=".pickle file containing the dictionary.")
+    parser.add_argument("--aff", help=".pickle file containing affiliation dictionary")
     args = parser.parse_args()
 
     if args.d:
         author_dict = queries.loadPickleDict(args.d)
 
-    if author_dict:
+    if author_dict and args.aff:
+        affiliation_graph = authnet.generate_affiliation_graph(author_dict, queries.loadPickleDict(args.aff))
+        summarize_graph(affiliation_graph, author_dict)
+    elif author_dict:
         coauthor_graph = authnet.generate_graph(author_dict)
         summarize_graph(coauthor_graph, author_dict)
