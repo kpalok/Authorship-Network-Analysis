@@ -39,7 +39,7 @@ def generate_affiliation_graph(author_dict, affiliation_dict, all_nodes):
 
     return coauthor_graph
 
-def generate_graph(author_dict, all_nodes):
+def generate_graph(author_dict, all_nodes=False):
     coauthor_graph = nx.Graph()
 
     coauthor_graph.add_nodes_from(author_dict.keys())
