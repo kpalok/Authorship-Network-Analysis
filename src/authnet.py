@@ -37,11 +37,15 @@ def show_graph(graph):
     nx.draw_networkx(graph, node_size=30, alpha=0.75, with_labels=False)
     plt.show()
 
-def save_graph(graph, graph_name):
+def save_graph(graph):
+    index = 0
+    while os.path.isfile("graph_{}.pdf".format(index)):
+        index += 1
+
     plt.figure(num=None, figsize=(20, 20), dpi=100)
     plt.axis('off')
     nx.draw_networkx(graph, node_size=5, alpha=0.75, with_labels=False)
-    plt.savefig("{}.pdf".format(graph_name[13:]), bbox_inches="tight")
+    plt.savefig("graph_{}.pdf".format(index), bbox_inches="tight")
 
 def search_communities(graph, graph_name):
     community_gen = community.k_clique_communities(graph, 2)
@@ -63,6 +67,13 @@ def get_degree_centrality_csv(graph):
         for key, value in dc_dict.items():
             writer.writerow({"node": key, "degree centrality": value})
 
+def prune_graph(graph, lower, upper):
+    dc_dict = nx.degree_centrality(graph)
+    filtered = { key:value for (key,value) in dc_dict.items() if value < lower or value > upper }
+    graph.remove_nodes_from(filtered)
+
+    return graph
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", help=".pickle file containing the dictionary.")
@@ -71,6 +82,8 @@ if __name__ == "__main__":
     parser.add_argument("-s", action="store_true", default=False, help="Save the graph.")
     parser.add_argument("-c", action="store_true", default=False, help="Analyse communities with k-clique k=2.")
     parser.add_argument("--degree", action="store_true", default=False, help="Get csv file of the degree centrality values.")
+    parser.add_argument("--prune", nargs=2, type=float, default=[0.0001, 0.001], metavar=("LOWER", "UPPER"),
+                        help="Prune the graph with degree centrality. E.g. --prune 0.0001 0.001")
     args = parser.parse_args()
 
     if args.d:
@@ -81,12 +94,14 @@ if __name__ == "__main__":
 
     if author_dict:
         coauthor_graph = generate_graph(author_dict, args.a)
+        if args.prune:
+            coauthor_graph = prune_graph(coauthor_graph, args.prune[0], args.prune[1])
         if args.c:
             search_communities(coauthor_graph, args.d if args.d else "example.pickle")
         if args.p:
             show_graph(coauthor_graph)
         if args.s:
-            save_graph(coauthor_graph, args.d)
+            save_graph(coauthor_graph)
         if args.degree:
             get_degree_centrality_csv(coauthor_graph)
     
