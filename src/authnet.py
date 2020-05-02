@@ -75,14 +75,17 @@ def search_communities(graph, graph_name):
     with open('communities/{}'.format(graph_name[13:]), 'wb') as file:
         pickle.dump(list(community_gen), file, protocol=pickle.HIGHEST_PROTOCOL)
 
-def get_degree_centrality_csv(graph):
-    dc_dict = nx.degree_centrality(graph)
-
-    index = 0
-    while os.path.isfile("../data/dc_{}.csv".format(index)):
-        index += 1
+def get_degree_centrality_csv(graph, graph_name):
+    dc_dict_norm = nx.degree_centrality(graph)
+    dc_dict = { key:int(round(value * (nx.number_of_nodes(graph) - 1))) for (key,value) in dc_dict_norm.items() }
     
-    with open("../data/dc_{}.csv".format(index), "w") as csvfile:
+    with open("../data/dc_norm_{}.csv".format(graph_name), "w") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=["node", "degree centrality"])
+        writer.writeheader()
+        for key, value in dc_dict_norm.items():
+            writer.writerow({"node": key, "degree centrality": value})
+    
+    with open("../data/dc_{}.csv".format(graph_name), "w") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=["node", "degree centrality"])
         writer.writeheader()
         for key, value in dc_dict.items():
@@ -128,7 +131,9 @@ if __name__ == "__main__":
         if args.p:
             show_graph(coauthor_graph)
         if args.s:
-            save_graph(coauthor_graph, args.d.split('/')[1].split('.')[0])
+            graph_name = args.aff.split('/')[1].split('.')[0] if args.aff else args.d.split('/')[1].split('.')[0]
+            save_graph(coauthor_graph, graph_name)
         if args.degree:
-            get_degree_centrality_csv(coauthor_graph)
+            graph_name = args.aff.split('/')[1].split('.')[0] if args.aff else args.d.split('/')[1].split('.')[0]
+            get_degree_centrality_csv(coauthor_graph, graph_name)
     
