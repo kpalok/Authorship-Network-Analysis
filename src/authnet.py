@@ -106,13 +106,13 @@ def get_degree_centrality_csv(graph, graph_name):
         writer = csv.DictWriter(csvfile, fieldnames=["node", "degree centrality"])
         writer.writeheader()
         for key, value in dc_dict_norm.items():
-            writer.writerow({"node": key, "degree centrality": value})
+            writer.writerow({"node": key.replace("\n", ""), "degree centrality": value})
     
     with open("../data/dc_{}.csv".format(graph_name), "w") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=["node", "degree centrality"])
         writer.writeheader()
         for key, value in dc_dict.items():
-            writer.writerow({"node": key, "degree centrality": value})
+            writer.writerow({"node": key.replace("\n", ""), "degree centrality": value})
 
 def prune_graph(graph, lower, upper):
     dc_dict = nx.degree_centrality(graph)
@@ -156,8 +156,12 @@ if __name__ == "__main__":
             show_graph(coauthor_graph)
         if args.s:
             graph_name = args.aff.split('/')[1].split('.')[0] if args.aff else args.d.split('/')[1].split('.')[0]
+            if (args.country):
+                graph_name += "_country"
             save_graph(coauthor_graph, graph_name)
         if args.degree:
             graph_name = args.aff.split('/')[1].split('.')[0] if args.aff else args.d.split('/')[1].split('.')[0]
+            if (args.countries):
+                graph_name += "_country"
             get_degree_centrality_csv(coauthor_graph, graph_name)
     
