@@ -3,6 +3,8 @@ import argparse
 import pickle
 import queries
 import csv
+import datetime
+import re
 import networkx as nx
 import matplotlib.pyplot as plt
 from networkx.algorithms import community
@@ -18,8 +20,29 @@ def generate_example_dict():
 
     return dict
 
-def generate_affiliation_graph(author_dict, affiliation_dict, all_nodes):
+def get_country(affiliation, countries):
+    for country in countries:
+        if re.search(country.strip(), affiliation, re.IGNORECASE):
+            return country
+
+    return None
+
+def group_by_countries(affiliation_dict):
+    with open("countries.txt") as c:
+        countries = c.readlines()
+
+    for key in affiliation_dict:
+        if affiliation_dict[key] != None:
+            affiliation_dict[key] = get_country(affiliation_dict[key], countries)
+    
+    return affiliation_dict
+
+def generate_affiliation_graph(author_dict, affiliation_dict, all_nodes, group_countries=False):
     coauthor_graph = nx.Graph()
+
+    if group_countries:
+        affiliation_dict = group_by_countries(affiliation_dict)
+
     # gen only unique values without None value
     s = set()
     for aff in affiliation_dict.values():
@@ -65,7 +88,7 @@ def save_graph(graph, dict_name):
 
     plt.figure(num=None, figsize=(20, 20), dpi=100)
     plt.axis('off')
-    nx.draw_networkx(graph, node_size=5, alpha=0.75, with_labels=False, width=0.1)
+    nx.draw_networkx(graph, node_size=20, alpha=0.75, with_labels=False, width=0.1)
     plt.savefig("../images/graph_{}{}.pdf".format(dict_name, index), bbox_inches="tight")
 
 def search_communities(graph, graph_name):
@@ -106,6 +129,7 @@ if __name__ == "__main__":
     parser.add_argument("--prune", nargs=2, type=float, metavar=("LOWER", "UPPER"),
                         help="Prune the graph with degree centrality. E.g. --prune 0.0001 0.001")
     parser.add_argument("--aff", help=".pickle file containing affiliation dictionary")
+    parser.add_argument("-countries",action="store_true", default=False, help="Group affiliations by countries")
     args = parser.parse_args()
  
     if args.d:
@@ -117,7 +141,7 @@ if __name__ == "__main__":
     if author_dict:
         if args.aff:
             affiliation_dict = queries.loadPickleDict(args.aff)
-            coauthor_graph = generate_affiliation_graph(author_dict, affiliation_dict, args.a)
+            coauthor_graph = generate_affiliation_graph(author_dict, affiliation_dict, args.a, args.countries)
         else:
             coauthor_graph = generate_graph(author_dict, args.a)
 

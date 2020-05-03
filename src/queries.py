@@ -104,13 +104,13 @@ if __name__ == "__main__":
     # with open('dictionaries/aff_yu.pickle', 'wb') as yu:
     #     pickle.dump(aff_yu, yu, protocol=pickle.HIGHEST_PROTOCOL)
 
-    auth_leung, aff_leung = getCoauthors("Victor C. M. Leung", "l/Leung:Victor_C=_M=", 2)
+    # auth_leung, aff_leung = getCoauthors("Victor C. M. Leung", "l/Leung:Victor_C=_M=", 2)
 
-    with open('dictionaries/auth_leung.pickle', 'wb') as leung:
-        pickle.dump(auth_leung, leung, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('dictionaries/auth_leung.pickle', 'wb') as leung:
+    #     pickle.dump(auth_leung, leung, protocol=pickle.HIGHEST_PROTOCOL)
 
-    with open('dictionaries/aff_leung.pickle', 'wb') as leung:
-        pickle.dump(aff_leung, leung, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open('dictionaries/aff_leung.pickle', 'wb') as leung:
+    #     pickle.dump(aff_leung, leung, protocol=pickle.HIGHEST_PROTOCOL)
 
-    # print("Philip S. Yu average co-authors of each co-author: ", getAverageCoauthorCountPerCoAuthor("Philip S. Yu", 'dictionaries/dict_yu.pickle'))
-    # print("Victor C. M. Leung average co-authors of each co-author: ", getAverageCoauthorCountPerCoAuthor("Victor C. M. Leung", 'dictionaries/dict_leung.pickle'))
+    print("Philip S. Yu average co-authors of each co-author: ", getAverageCoauthorCountPerCoAuthor("Philip S. Yu", 'dictionaries/auth_yu.pickle'))
+    print("Victor C. M. Leung average co-authors of each co-author: ", getAverageCoauthorCountPerCoAuthor("Victor C. M. Leung", 'dictionaries/auth_leung.pickle'))
