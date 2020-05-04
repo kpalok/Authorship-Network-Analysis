@@ -1,40 +1,15 @@
 library(readr)
 library(poweRlaw)
 
-estimateParameters <- function(dist, estimate=NULL) {
-  est <- if(!is.null(estimate)) estimate else estimate_xmin(dist)
-  dist$setXmin(est)
-  
-  pars <- estimate_pars(dist)
-  dist$setPars(pars)
-  
-  return(dist)
-}
-
-getData <- function(path) {
-  data <- data.frame(read_csv(path))
-  data <- data[data$degree.centrality != 0,]
-  data <- sort(as.integer(data[[2]]), decreasing=T)
-  dist <- displ$new(data)
-  
-  dist <- estimateParameters(dist)
-  
-  return(list(data=data, dist=dist))
-}
-
-plotFit <- function(dist, name) {
-  plot(dist, pch=20, cex=0.5, type="p", main=name,
-       ylab="CDF", xlab="degree")
-  lines(dist, col="red", lwd=2)
-}
+source("plfunc.R")
 
 # Get data
-leung <- getData("../data/dc_auth_leung.csv")
 yu <- getData("../data/dc_auth_yu.csv")
-leung.aff <- getData("../data/dc_aff_leung.csv")
+leung <- getData("../data/dc_auth_leung.csv")
 yu.aff <- getData("../data/dc_aff_yu.csv")
-leung.country <- getData("../data/dc_aff_leung_country.csv")
+leung.aff <- getData("../data/dc_aff_leung.csv")
 yu.country <- getData("../data/dc_aff_yu_country.csv")
+leung.country <- getData("../data/dc_aff_leung_country.csv")
 
 
 # Plot fit
@@ -56,51 +31,59 @@ mtext(text=expression(bold("Power law fit for affiliations grouped by country"))
 
 
 # Set estimates of xmin to 120 (no need to do this for countries)
-yu$dist <- estimateParameters(yu$dist, 120)
-leung$dist <- estimateParameters(leung$dist, 120)
-yu.aff$dist <- estimateParameters(yu.aff$dist, 120)
-leung.aff$dist <- estimateParameters(leung.aff$dist, 120)
+yu.120 <- getData("../data/dc_auth_yu.csv")
+yu.120$dist <- estimateParameters(yu.120$dist, 120)
+leung.120 <- getData("../data/dc_auth_leung.csv")
+leung.120$dist <- estimateParameters(leung.120$dist, 120)
+yu.aff.120 <- getData("../data/dc_aff_yu.csv")
+yu.aff.120$dist <- estimateParameters(yu.aff.120$dist, 120)
+leung.aff.120 <- getData("../data/dc_aff_leung.csv")
+leung.aff.120$dist <- estimateParameters(leung.aff.120$dist, 120)
 
 
 # Plot fit
-plotFit(yu$dist, "Yu")
-plotFit(leung$dist, "Leung")
+plotFit(yu.120$dist, "Yu")
+plotFit(leung.120$dist, "Leung")
 mtext(text=expression(bold("Power law fit for authors when x"[min]*" is set to 120")),
       outer=TRUE, cex=1)
 
-plotFit(yu.aff$dist, "Yu")
-plotFit(leung.aff$dist, "Leung")
+plotFit(yu.aff.120$dist, "Yu")
+plotFit(leung.aff.120$dist, "Leung")
 mtext(text=expression(bold("Power law fit for all affiliations when x"[min]*" is set to 120")),
       outer=TRUE, cex=1)
 
 
-# Plot all values in a log-log plot
-par(mfrow=c(2,3))
-plot(sort(yu$data, decreasing=T), log="xy", ylab="degree",
-     main="Yu", pch=20, cex=0.5, type="p")
-plot(sort(yu.aff$data, decreasing=T), log="xy", ylab="degree",
-     main="Yu Affiliations", pch=20, cex=0.5, type="p")
-plot(sort(yu.country$data, decreasing=T), log="xy", ylab="degree",
-     main="Yu Country", pch=20, cex=0.5, type="p")
-plot(sort(leung$data, decreasing=T), log="xy", ylab="degree",
-     main="Leung", pch=20, cex=0.5, type="p")
-plot(sort(leung.aff$data, decreasing=T), log="xy", ylab="degree",
-     main="Leung Affiliations", pch=20, cex=0.5, type="p")
-plot(sort(leung.country$data, decreasing=T), log="xy", ylab="degree",
-     main="Leung Country", pch=20, cex=0.5, type="p")
-
-
 # Calculate P-values
 yu$bsp <- bootstrap_p(yu$dist, no_of_sims=1000, threads=2)
+yu.120$bsp <- bootstrap_p(yu.120$dist, no_of_sims=1000, threads=2)
 yu.aff$bsp <- bootstrap_p(yu.aff$dist, no_of_sims=1000, threads=2)
+yu.aff.120$bsp <- bootstrap_p(yu.aff.120$dist, no_of_sims=1000, threads=2)
 yu.country$bsp <- bootstrap_p(yu.country$dist, no_of_sims=1000, threads=2)
 leung$bsp <- bootstrap_p(leung$dist, no_of_sims=1000, threads=2)
+leung.120$bsp <- bootstrap_p(leung.120$dist, no_of_sims=1000, threads=2)
 leung.aff$bsp <- bootstrap_p(leung.aff$dist, no_of_sims=1000, threads=2)
+leung.aff.120$bsp <- bootstrap_p(leung.aff.120$dist, no_of_sims=1000, threads=2)
 leung.country$bsp <- bootstrap_p(leung.country$dist, no_of_sims=1000, threads=2)
 
-pvalues <- matrix(c(yu$bsp$p, yu.aff$bsp$p, yu.country$bsp$p,
-                    leung$bsp$p, leung.aff$bsp$p, leung.country$bsp$p),
-                  nrow=1, ncol=6)
-colnames(pvalues) <- c("Yu", "Yu Aff", "Yu Coun", "Leung", "Leung Aff", "Leung Coun")
+pvalues <- matrix(c(yu$bsp$p, leung$bsp$p, yu.120$bsp$p, leung.120$bsp$p,
+                    yu.aff$bsp$p, leung.aff$bsp$p, yu.aff.120$bsp$p,
+                    leung.aff.120$bsp$p, yu.country$bsp$p, leung.country$bsp$p),
+                  nrow=1, ncol=10)
+colnames(pvalues) <- c("Yu", "Leung", "Yu 120", "Leung 120", "Yu Aff", "Leung Aff",
+                       "Yu Aff 120", "Leung Aff 120", "Yu Coun", "Leung Coun")
 rownames(pvalues) <- "P-values"
 pvalues
+
+
+# Compare to alternative distributions
+dat <- list(yu=yu, leung=leung, yu.120=yu.120, leung.120=leung.120, 
+            yu.aff=yu.aff, leung.aff=leung.aff, yu.aff.120=yu.aff.120,
+            leung.aff.120=leung.aff.120, yu.country=yu.country, leung.country=leung.country)
+names <- list("Yu", "Leung", "Yu 120", "Leung 120", "Yu Aff", "Leung Aff",
+              "Yu Aff 120", "Leung Aff 120", "Yu Coun", "Leung Coun")
+i <- 0
+for (d in dat) {
+  i <- i+1
+  compareAlternative(d$data, d$dist, names[i])
+}
+
