@@ -99,14 +99,31 @@ def show_graph(graph, best_partition=False):
 
     plt.show()
 
-def save_graph(graph, dict_name):
+def save_graph(graph, dict_name, best_partition=False):
     index = 0
     while os.path.isfile("../images/graph_{}{}.pdf".format(dict_name, index)):
         index += 1
 
     plt.figure(num=None, figsize=(20, 20), dpi=100)
     plt.axis('off')
-    nx.draw_networkx(graph, node_size=20, alpha=0.75, with_labels=False, width=0.1)
+
+    if best_partition:
+        partition = community_louvain.best_partition(graph)
+
+        size = int(len(set(partition.values())))
+        pos = nx.spring_layout(graph)
+        count = 0
+        colors = plt.cm.hsv(np.linspace(0,1,size))
+
+        for com in set(partition.values()):
+            list_nodes = [node for node in partition.keys() if partition[node] == com]
+            nx.draw_networkx_nodes(graph, pos, list_nodes, node_size=20, node_color=colors[count])
+            count += 1
+
+        nx.draw_networkx_edges(graph, pos, alpha=0.75)
+    else:
+        nx.draw_networkx(graph, node_size=20, alpha=0.75, with_labels=False, width=0.1)
+        
     plt.savefig("../images/graph_{}{}.pdf".format(dict_name, index), bbox_inches="tight")
 
 def search_communities(graph, graph_name):
@@ -175,9 +192,9 @@ if __name__ == "__main__":
             show_graph(coauthor_graph, args.b)
         if args.s:
             graph_name = args.aff.split('/')[1].split('.')[0] if args.aff else args.d.split('/')[1].split('.')[0]
-            if (args.country):
+            if (args.countries):
                 graph_name += "_country"
-            save_graph(coauthor_graph, graph_name)
+            save_graph(coauthor_graph, graph_name, args.b)
         if args.degree:
             graph_name = args.aff.split('/')[1].split('.')[0] if args.aff else args.d.split('/')[1].split('.')[0]
             if (args.countries):
