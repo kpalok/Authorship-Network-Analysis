@@ -5,6 +5,8 @@ import queries
 import csv
 import datetime
 import re
+import numpy as np
+import community as community_louvain #pip install python-louvain
 import networkx as nx
 import matplotlib.pyplot as plt
 from networkx.algorithms import community
@@ -37,7 +39,7 @@ def group_by_countries(affiliation_dict):
     
     return affiliation_dict
 
-def generate_affiliation_graph(author_dict, affiliation_dict, all_nodes, group_countries=False):
+def generate_affiliation_graph(author_dict, affiliation_dict, all_nodes, group_countries):
     coauthor_graph = nx.Graph()
 
     if group_countries:
@@ -77,8 +79,24 @@ def generate_graph(author_dict, all_nodes=False):
 
     return coauthor_graph
 
-def show_graph(graph):
-    nx.draw_networkx(graph, node_size=30, alpha=0.75, with_labels=False, width=0.1)
+def show_graph(graph, best_partition=False):
+    if best_partition:
+        partition = community_louvain.best_partition(graph)
+
+        size = int(len(set(partition.values())))
+        pos = nx.spring_layout(graph)
+        count = 0
+        colors = plt.cm.hsv(np.linspace(0,1,size))
+
+        for com in set(partition.values()):
+            list_nodes = [node for node in partition.keys() if partition[node] == com]
+            nx.draw_networkx_nodes(graph, pos, list_nodes, node_size=30, node_color=colors[count])
+            count += 1
+
+        nx.draw_networkx_edges(graph, pos, alpha=0.75)
+    else:
+        nx.draw_networkx(graph, node_size=30, alpha=0.75, with_labels=False, width=0.1)
+
     plt.show()
 
 def save_graph(graph, dict_name):
@@ -95,7 +113,7 @@ def search_communities(graph, graph_name):
     community_gen = community.k_clique_communities(graph, 2)
     print(list(community_gen))
 
-    with open('communities/{}'.format(graph_name[13:]), 'wb') as file:
+    with open('communities_{}'.format(graph_name[13:]), 'wb') as file:
         pickle.dump(list(community_gen), file, protocol=pickle.HIGHEST_PROTOCOL)
 
 def get_degree_centrality_csv(graph, graph_name):
@@ -128,6 +146,7 @@ if __name__ == "__main__":
     parser.add_argument("-a", action="store_true", default=False, help="Include isolated nodes to graph.")
     parser.add_argument("-s", action="store_true", default=False, help="Save the graph.")
     parser.add_argument("-c", action="store_true", default=False, help="Analyse communities with k-clique k=2.")
+    parser.add_argument("-b", action="store_true", default=False, help="Show communities by best partition.")
     parser.add_argument("--degree", action="store_true", default=False, help="Get csv file of the degree centrality values.")
     parser.add_argument("--prune", nargs=2, type=float, metavar=("LOWER", "UPPER"),
                         help="Prune the graph with degree centrality. E.g. --prune 0.0001 0.001")
@@ -153,7 +172,7 @@ if __name__ == "__main__":
         if args.c:
             search_communities(coauthor_graph, args.d if args.d else "example.pickle")
         if args.p:
-            show_graph(coauthor_graph)
+            show_graph(coauthor_graph, args.b)
         if args.s:
             graph_name = args.aff.split('/')[1].split('.')[0] if args.aff else args.d.split('/')[1].split('.')[0]
             if (args.country):
